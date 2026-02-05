@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Stars Bot - WebApp</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="container webapp-container">
+        <!-- Заголовок WebApp -->
+        <div class="webapp-header">
+            <div class="webapp-title">
+                <h2>⭐ Stars Bot WebApp</h2>
+                <p>Управляйте звездами прямо в Telegram</p>
+            </div>
+            <div class="webapp-user" id="webapp-user">
+                <div class="user-avatar">👤</div>
+                <div class="user-info">
+                    <div class="user-name" id="user-name">Пользователь</div>
+                    <div class="user-id" id="user-id">#000000</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Баланс -->
+        <div class="balance-section webapp-balance">
+            <div class="star-balance">
+                <span class="star-icon">⭐</span>
+                <span class="balance-amount" id="webapp-balance">0</span>
+            </div>
+            <div class="balance-text">Ваш баланс в звездах</div>
+        </div>
+
+        <!-- Быстрые действия -->
+        <div class="quick-actions">
+            <button class="quick-action-btn" onclick="quickBuy()">
+                <div class="btn-icon">🛒</div>
+                <div class="btn-text">Купить</div>
+            </button>
+            <button class="quick-action-btn" onclick="quickSend()">
+                <div class="btn-icon">📤</div>
+                <div class="btn-text">Отправить</div>
+            </button>
+            <button class="quick-action-btn" onclick="quickCheck()">
+                <div class="btn-icon">⭐</div>
+                <div class="btn-text">Чек</div>
+            </button>
+        </div>
+
+        <!-- Главное меню -->
+        <div class="main-menu">
+            <div class="menu-grid">
+                <button class="menu-item" onclick="showWallet()">
+                    <div class="menu-icon">👛</div>
+                    <div class="menu-text">Кошелек</div>
+                </button>
+                
+                <button class="menu-item" onclick="showShop()">
+                    <div class="menu-icon">🛒</div>
+                    <div class="menu-text">Магазин</div>
+                </button>
+                
+                <button class="menu-item" onclick="showDeposit()">
+                    <div class="menu-icon">💰</div>
+                    <div class="menu-text">Пополнить</div>
+                </button>
+                
+                <button class="menu-item" onclick="showCreateCheck()">
+                    <div class="menu-icon">⭐</div>
+                    <div class="menu-text">Создать чек</div>
+                </button>
+                
+                <button class="menu-item" onclick="showWithdraw()">
+                    <div class="menu-icon">📤</div>
+                    <div class="menu-text">Вывести</div>
+                </button>
+                
+                <button class="menu-item" onclick="showAutoBuyer()">
+                    <div class="menu-icon">🎁</div>
+                    <div class="menu-text">Автоскупщик</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Кнопки WebApp -->
+        <div class="webapp-buttons">
+            <button class="webapp-btn primary" onclick="showShop()">
+                🛒 Купить звезды
+            </button>
+            <button class="webapp-btn secondary" onclick="openFullApp()">
+                🌐 Полное приложение
+            </button>
+        </div>
+    </div>
+
+    <style>
+        .webapp-container {
+            padding: 15px;
+            max-width: 100%;
+        }
+
+        .webapp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .webapp-title h2 {
+            margin: 0 0 5px 0;
+            font-size: 20px;
+            color: #FFD700;
+        }
+
+        .webapp-title p {
+            margin: 0;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .webapp-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .user-id {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .webapp-balance {
+            margin-bottom: 25px;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .quick-action-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .quick-action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .quick-action-btn .btn-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .quick-action-btn .btn-text {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .main-menu {
+            margin-bottom: 25px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .menu-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 15px;
+            padding: 20px 15px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .menu-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .menu-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .webapp-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .webapp-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .webapp-btn.primary {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+        }
+
+        .webapp-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .webapp-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .transaction-icon {
+            font-size: 18px;
+        }
+
+        .transaction-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .transaction-type {
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .transaction-amount {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .transaction-amount.positive {
+            color: #28a745;
+        }
+
+        .transaction-amount.negative {
+            color: #dc3545;
+        }
+    </style>
+
+    <script>
+        // Инициализация Telegram WebApp
+        let tg = window.Telegram.WebApp;
+        
+        // Настройка WebApp
+        tg.expand();
+        tg.MainButton.setText("Открыть полное приложение");
+        tg.MainButton.show();
+        
+        // Данные пользователя
+        let webAppData = {
+            balance: 0,
+            transactions: []
+        };
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            initWebApp();
+            loadWebAppData();
+        });
+
+        function initWebApp() {
+            // Получаем данные пользователя из Telegram
+            if (tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                document.getElementById('user-name').textContent = user.first_name || 'Пользователь';
+                document.getElementById('user-id').textContent = '#' + user.id;
+                
+                // Если есть фото профиля, можно добавить
+                if (user.photo_url) {
+                    document.querySelector('.user-avatar').innerHTML = `<img src="${user.photo_url}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                }
+            }
+            
+            // Настройка главной кнопки
+            tg.MainButton.setText("🛒 Магазин звезд");
+            tg.MainButton.color = "#FFD700";
+            tg.MainButton.textColor = "#000000";
+            tg.MainButton.show();
+            tg.MainButton.onClick(showShop);
+            
+            // Настройка темы
+            document.body.style.backgroundColor = tg.themeParams.bg_color || '#1a1a2e';
+        }
+
+        function loadWebAppData() {
+            // Загружаем данные из localStorage или API
+            const savedBalance = localStorage.getItem('webAppBalance');
+            if (savedBalance) {
+                webAppData.balance = parseInt(savedBalance);
+                document.getElementById('webapp-balance').textContent = webAppData.balance;
+            }
+            
+            const savedTransactions = localStorage.getItem('webAppTransactions');
+            if (savedTransactions) {
+                webAppData.transactions = JSON.parse(savedTransactions);
+                updateTransactionList();
+            }
+        }
+
+        function updateTransactionList() {
+            const transactionList = document.getElementById('transaction-list');
+            
+            if (webAppData.transactions.length === 0) {
+                transactionList.innerHTML = `
+                    <div class="no-transactions">
+                        <div class="no-transactions-icon">📝</div>
+                        <div class="no-transactions-text">Операций пока нет</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const recentTransactions = webAppData.transactions.slice(-5).reverse();
+            transactionList.innerHTML = recentTransactions.map(transaction => `
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-icon">${getTransactionIcon(transaction.type)}</div>
+                        <div class="transaction-details">
+                            <div class="transaction-type">${transaction.type}</div>
+                            <div class="transaction-date">${transaction.date}</div>
+                        </div>
+                    </div>
+                    <div class="transaction-amount ${transaction.amount > 0 ? 'positive' : 'negative'}">
+                        ${transaction.amount > 0 ? '+' : ''}${transaction.amount} ⭐
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getTransactionIcon(type) {
+            const icons = {
+                'Покупка': '🛒',
+                'Вывод': '📤',
+                'Создание чека': '⭐',
+                'Активация чека': '💰',
+                'Пополнение': '💳'
+            };
+            return icons[type] || '💫';
+        }
+
+        function showWallet() {
+            tg.showPopup({
+                title: '👛 Кошелек',
+                message: `Ваш баланс: ${webAppData.balance} ⭐\n\nИстория транзакций:\n${webAppData.transactions.length > 0 ? 'Последние операции в списке выше' : 'Транзакций пока нет'}`,
+                buttons: [
+                    {id: 'ok', type: 'ok', text: 'Понятно'}
+                ]
+            });
+        }
+
+        function showShop() {
+            tg.showPopup({
+                title: '🛒 Магазин звезд',
+                message: 'Выберите пакет для покупки:',
+                buttons: [
+                    {id: 'buy_100', type: 'default', text: '100 ⭐ - 150₽'},
+                    {id: 'buy_500', type: 'default', text: '500 ⭐ - 750₽'},
+                    {id: 'buy_1000', type: 'default', text: '1000 ⭐ - 1500₽'},
+                    {id: 'cancel', type: 'cancel', text: 'Отмена'}
+                ]
+            }, function(buttonId) {
+                if (buttonId === 'buy_100') {
+                    processPurchase(100, 150);
+                } else if (buttonId === 'buy_500') {
+                    processPurchase(500, 750);
+                } else if (buttonId === 'buy_1000') {
+                    processPurchase(1000, 1500);
+                }
+            });
+        }
+
+        function showDeposit() {
+            tg.showPopup({
+                title: '💰 Пополнение баланса',
+                message: 'Выберите способ пополнения:',
+                buttons: [
+                    {id: 'card', type: 'default', text: '💳 Банковская карта'},
+                    {id: 'crypto', type: 'default', text: '₿ Криптовалюта'},
+                    {id: 'wallet', type: 'default', text: '💼 Электронные кошельки'},
+                    {id: 'cancel', type: 'cancel', text: 'Отмена'}
+                ]
+            }, function(buttonId) {
+                if (buttonId !== 'cancel') {
+                    tg.showAlert('Пополнение будет доступно в полной версии');
+                }
+            });
+        }
+
+        function showCreateCheck() {
+            if (webAppData.balance === 0) {
+                tg.showAlert('Недостаточно средств для создания чека. Пополните баланс.');
+                return;
+            }
+            
+            const amount = Math.min(webAppData.balance, 100);
+            tg.showPopup({
+                title: '⭐ Создать чек',
+                message: `Ваш баланс: ${webAppData.balance} ⭐\n\nСоздать чек на ${amount} ⭐?`,
+                buttons: [
+                    {id: 'create', type: 'default', text: 'Создать'},
+                    {id: 'cancel', type: 'cancel', text: 'Отмена'}
+                ]
+            }, function(buttonId) {
+                if (buttonId === 'create') {
+                    createQuickCheck(amount);
+                }
+            });
+        }
+
+        function showWithdraw() {
+            if (webAppData.balance === 0) {
+                tg.showAlert('Недостаточно средств для вывода. Пополните баланс.');
+                return;
+            }
+            
+            tg.showPopup({
+                title: '📤 Вывод звезд',
+                message: `Ваш баланс: ${webAppData.balance} ⭐\n\nВывести все звезды?\nКомиссия: 5%`,
+                buttons: [
+                    {id: 'withdraw', type: 'destructive', text: 'Вывести'},
+                    {id: 'cancel', type: 'cancel', text: 'Отмена'}
+                ]
+            }, function(buttonId) {
+                if (buttonId === 'withdraw') {
+                    processWithdraw();
+                }
+            });
+        }
+
+        function showAutoBuyer() {
+            tg.showPopup({
+                title: '🎁 Автоскупщик подарков',
+                message: 'Статус: Выключен\nМаксимальная цена: не установлена\nКатегории: все\n\nАвтоскупщик автоматически покупает подарки по заданным критериям.',
+                buttons: [
+                    {id: 'settings', type: 'default', text: '⚙️ Настройки'},
+                    {id: 'enable', type: 'default', text: '▶️ Включить'},
+                    {id: 'cancel', type: 'cancel', text: 'Закрыть'}
+                ]
+            }, function(buttonId) {
+                if (buttonId === 'settings') {
+                    tg.showAlert('Настройки автоскупщика будут доступны в полной версии');
+                } else if (buttonId === 'enable') {
+                    tg.showAlert('Автоскупщик включен! (демо режим)');
+                }
+            });
+        }
+
+        function processWithdraw() {
+            const amount = webAppData.balance;
+            const commission = Math.ceil(amount * 0.05);
+            
+            webAppData.balance = 0;
+            webAppData.transactions.push({
+                type: 'Вывод',
+                amount: -amount,
+                date: new Date().toLocaleDateString()
+            });
+            
+            // Сохраняем данные
+            localStorage.setItem('webAppBalance', webAppData.balance.toString());
+            localStorage.setItem('webAppTransactions', JSON.stringify(webAppData.transactions));
+            
+            // Обновляем интерфейс
+            document.getElementById('webapp-balance').textContent = webAppData.balance;
+            
+            tg.showAlert(`Успешно выведено ${amount} ⭐!\nКомиссия: ${commission} ⭐`);
+            tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        function quickSend() {
+            tg.showPopup({
+                title: '📤 Отправить звезды',
+                message: 'Функция отправки звезд. В полной версии здесь будет форма для ввода суммы и получателя.',
+                buttons: [
+                    {id: 'ok', type: 'ok', text: 'Понятно'}
+                ]
+            });
+        }
+
+        function quickCheck() {
+            if (webAppData.balance === 0) {
+                tg.showAlert('Недостаточно средств для создания чека. Пополните баланс.');
+                return;
+            }
+            
+            const amount = Math.min(webAppData.balance, 100);
+            createQuickCheck(amount);
+        }
+
+        function processPurchase(stars, rubles) {
+            // Имитация покупки
+            webAppData.balance += stars;
+            webAppData.transactions.push({
+                type: 'Покупка',
+                amount: stars,
+                date: new Date().toLocaleDateString()
+            });
+            
+            // Сохраняем данные
+            localStorage.setItem('webAppBalance', webAppData.balance.toString());
+            localStorage.setItem('webAppTransactions', JSON.stringify(webAppData.transactions));
+            
+            // Обновляем интерфейс
+            document.getElementById('webapp-balance').textContent = webAppData.balance;
+            updateTransactionList();
+            
+            tg.showAlert(`Успешно куплено ${stars} ⭐ за ${rubles}₽!`);
+            
+            // Вибрация успеха
+            tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        function createQuickCheck(amount) {
+            webAppData.balance -= amount;
+            webAppData.transactions.push({
+                type: 'Создание чека',
+                amount: -amount,
+                date: new Date().toLocaleDateString()
+            });
+            
+            // Сохраняем данные
+            localStorage.setItem('webAppBalance', webAppData.balance.toString());
+            localStorage.setItem('webAppTransactions', JSON.stringify(webAppData.transactions));
+            
+            // Обновляем интерфейс
+            document.getElementById('webapp-balance').textContent = webAppData.balance;
+            updateTransactionList();
+            
+            const checkId = Math.random().toString(36).substr(2, 9);
+            tg.showAlert(`Чек на ${amount} ⭐ создан!\nID: ${checkId}`);
+            
+            // Вибрация успеха
+            tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function openFullApp() {
+            // Открываем полное приложение в новой вкладке
+            window.open('index.html', '_blank');
+        }
+
+        function closeWebApp() {
+            tg.close();
+        }
+
+        // Обработка закрытия WebApp
+        tg.onEvent('mainButtonClicked', showShop);
+        
+        // Синхронизация данных с основным приложением
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'userBalance') {
+                webAppData.balance = parseInt(e.newValue) || 0;
+                document.getElementById('webapp-balance').textContent = webAppData.balance;
+            }
+            if (e.key === 'userTransactions') {
+                webAppData.transactions = JSON.parse(e.newValue) || [];
+                updateTransactionList();
+            }
+        });
+    </script>
+</body>
+</html>
