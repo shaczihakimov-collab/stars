@@ -56,6 +56,59 @@
             </div>
         </div>
 
+        <!-- Главное меню (скрыто по умолчанию) -->
+        <div id="main-menu" class="menu-overlay" style="display: none;">
+            <div class="menu-content">
+                <div class="welcome-section">
+                    <img src="images/photo_2026-01-28_15-11-47.jpg" alt="Stars Bot" class="welcome-image">
+                    <div class="welcome-text">
+                        <h2>Привет! Это удобный бот для покупки/передачи звезд в Telegram.</h2>
+                        <p>С помощью него можно моментально покупать и передавать звезды.</p>
+                        <p>Бот работает почти год, и с помощью него куплена большая доля звезд в Telegram.</p>
+                        <div class="stats">
+                            <strong>С помощью бота куплено:</strong><br>
+                            7,357,760 ⭐ (~ $110,366)
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="menu-buttons">
+                    <div class="menu-row">
+                        <button class="menu-btn" onclick="showWallet()">👛 Кошелек</button>
+                        <button class="menu-btn" onclick="showShop()">🛒 Магазин</button>
+                    </div>
+                    <div class="menu-row">
+                        <button class="menu-btn" onclick="showDeposit()">💰 Пополнить Баланс</button>
+                        <button class="menu-btn" onclick="showCreateCheck()">⭐ Создать чек</button>
+                    </div>
+                    <div class="menu-row">
+                        <button class="menu-btn" onclick="showWithdraw()">💰 Вывести звезды</button>
+                        <button class="menu-btn" onclick="showAutoBuyer()">🎁 Автоскупщик подарков</button>
+                    </div>
+                    <div class="menu-row" id="auth-menu-row">
+                        <button class="menu-btn auth-btn" onclick="handleAuthAction()">
+                            <span id="auth-btn-text">🔐 Войти</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <button class="close-menu" onclick="closeMenu()">✕</button>
+            </div>
+        </div>
+
+        <!-- Модальные окна для разных разделов -->
+        <div id="modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-title">Заголовок</h3>
+                    <button class="close-modal" onclick="closeModal()">✕</button>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    Содержимое модального окна
+                </div>
+            </div>
+        </div>
+
         <!-- Кнопка для открытия главного меню -->
         <button class="menu-toggle" onclick="showMainMenu()">☰</button>
     </div>
@@ -134,6 +187,11 @@
         function updateBalance(newBalance) {
             document.getElementById('balance-amount').textContent = newBalance.toLocaleString();
             
+            // Обновляем баланс в userData для script.js
+            if (window.userData) {
+                window.userData.balance = newBalance;
+            }
+            
             // Сохраняем в localStorage
             if (currentUserId) {
                 localStorage.setItem(`balance_${currentUserId}`, newBalance.toString());
@@ -204,6 +262,26 @@
             console.log(`👤 ID пользователя: ${currentUserId}`);
             return currentUserId;
         };
+        
+        // Инициализация userData для совместимости с script.js
+        if (!window.userData) {
+            window.userData = {
+                balance: 0,
+                transactions: [],
+                stats: {
+                    totalStars: 7357760,
+                    totalUsd: 110366
+                }
+            };
+        }
+        
+        // Обновляем баланс в userData при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentBalance = parseInt(document.getElementById('balance-amount').textContent.replace(/,/g, '')) || 0;
+            if (window.userData) {
+                window.userData.balance = currentBalance;
+            }
+        });
     </script>
 </body>
 </html>
