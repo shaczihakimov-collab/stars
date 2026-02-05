@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Stars Bot</title>
+    <title>Telegram Stars Bot - WebApp</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div class="container">
@@ -20,7 +21,7 @@
         <div class="balance-section">
             <div class="star-balance">
                 <span class="star-icon">⭐</span>
-                <span class="balance-amount">0</span>
+                <span class="balance-amount" id="balance-amount">0</span>
             </div>
             <div class="balance-text">Общий баланс в звездах</div>
         </div>
@@ -55,63 +56,154 @@
             </div>
         </div>
 
-        <!-- Главное меню (скрыто по умолчанию) -->
-        <div id="main-menu" class="menu-overlay" style="display: none;">
-            <div class="menu-content">
-                <div class="welcome-section">
-                    <img src="images/photo_2026-01-28_15-11-47.jpg" alt="Stars Bot" class="welcome-image">
-                    <div class="welcome-text">
-                        <h2>Привет! Это удобный бот для покупки/передачи звезд в Telegram.</h2>
-                        <p>С помощью него можно моментально покупать и передавать звезды.</p>
-                        <p>Бот работает почти год, и с помощью него куплена большая доля звезд в Telegram.</p>
-                        <div class="stats">
-                            <strong>С помощью бота куплено:</strong><br>
-                            7,357,760 ⭐ (~ $110,366)
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="menu-buttons">
-                    <div class="menu-row">
-                        <button class="menu-btn" onclick="showWallet()">👛 Кошелек</button>
-                        <button class="menu-btn" onclick="showShop()">🛒 Магазин</button>
-                    </div>
-                    <div class="menu-row">
-                        <button class="menu-btn" onclick="showDeposit()">💰 Пополнить Баланс</button>
-                        <button class="menu-btn" onclick="showCreateCheck()">⭐ Создать чек</button>
-                    </div>
-                    <div class="menu-row">
-                        <button class="menu-btn" onclick="showWithdraw()">💰 Вывести звезды</button>
-                        <button class="menu-btn" onclick="showAutoBuyer()">🎁 Автоскупщик подарков</button>
-                    </div>
-                    <div class="menu-row" id="auth-menu-row">
-                        <button class="menu-btn auth-btn" onclick="handleAuthAction()">
-                            <span id="auth-btn-text">🔐 Войти</span>
-                        </button>
-                    </div>
-                </div>
-                
-                <button class="close-menu" onclick="closeMenu()">✕</button>
-            </div>
-        </div>
-
-        <!-- Модальные окна для разных разделов -->
-        <div id="modal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="modal-title">Заголовок</h3>
-                    <button class="close-modal" onclick="closeModal()">✕</button>
-                </div>
-                <div class="modal-body" id="modal-body">
-                    Содержимое модального окна
-                </div>
-            </div>
-        </div>
-
         <!-- Кнопка для открытия главного меню -->
         <button class="menu-toggle" onclick="showMainMenu()">☰</button>
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // Инициализация Telegram WebApp
+        let tg = window.Telegram?.WebApp;
+        let currentUserId = null;
+        
+        if (tg) {
+            // Настройка WebApp
+            tg.expand();
+            tg.ready();
+            
+            // Настройка главной кнопки
+            tg.MainButton.setText("🛒 Купить звезды");
+            tg.MainButton.color = "#FFD700";
+            tg.MainButton.textColor = "#000000";
+            tg.MainButton.show();
+            tg.MainButton.onClick(showShop);
+            
+            // Получаем данные пользователя
+            if (tg.initDataUnsafe?.user) {
+                const user = tg.initDataUnsafe.user;
+                currentUserId = user.id;
+                console.log('Telegram user:', user);
+                
+                // Загружаем баланс пользователя
+                loadUserBalance(user.id);
+            }
+            
+            // Настройка темы
+            if (tg.themeParams) {
+                document.body.style.backgroundColor = tg.themeParams.bg_color || '#1a1a2e';
+            }
+        }
+        
+        // Функция для загрузки баланса пользователя
+        function loadUserBalance(userId) {
+            // Пытаемся загрузить баланс из Telegram Cloud Storage
+            if (tg && tg.CloudStorage) {
+                tg.CloudStorage.getItem(`balance_${userId}`, function(err, value) {
+                    if (!err && value) {
+                        const balance = parseInt(value);
+                        updateBalance(balance);
+                        console.log(`✅ Баланс загружен из Telegram Cloud: ${balance} ⭐`);
+                        return;
+                    }
+                    
+                    // Fallback к localStorage
+                    loadFromLocalStorage(userId);
+                });
+            } else {
+                // Fallback к localStorage
+                loadFromLocalStorage(userId);
+            }
+        }
+        
+        // Функция для загрузки из localStorage
+        function loadFromLocalStorage(userId) {
+            const userBalance = localStorage.getItem(`balance_${userId}`);
+            if (userBalance) {
+                const balance = parseInt(userBalance);
+                updateBalance(balance);
+                console.log(`✅ Баланс загружен из localStorage: ${balance} ⭐`);
+            } else {
+                // Если баланса нет, устанавливаем 0
+                updateBalance(0);
+                localStorage.setItem(`balance_${userId}`, '0');
+                console.log('💡 Установлен начальный баланс: 0 ⭐');
+            }
+        }
+        
+        // Функция для обновления баланса в WebApp
+        function updateBalance(newBalance) {
+            document.getElementById('balance-amount').textContent = newBalance.toLocaleString();
+            
+            // Сохраняем в localStorage
+            if (currentUserId) {
+                localStorage.setItem(`balance_${currentUserId}`, newBalance.toString());
+                
+                // Также сохраняем в Telegram Cloud Storage если доступно
+                if (tg && tg.CloudStorage) {
+                    tg.CloudStorage.setItem(`balance_${currentUserId}`, newBalance.toString());
+                }
+            }
+        }
+        
+        // Проверяем обновления баланса каждые 2 секунды
+        setInterval(() => {
+            if (currentUserId) {
+                // Проверяем Telegram Cloud Storage
+                if (tg && tg.CloudStorage) {
+                    tg.CloudStorage.getItem(`balance_${currentUserId}`, function(err, value) {
+                        if (!err && value) {
+                            const balance = parseInt(value);
+                            const currentDisplayed = parseInt(document.getElementById('balance-amount').textContent.replace(/,/g, ''));
+                            
+                            if (balance !== currentDisplayed) {
+                                updateBalance(balance);
+                                console.log(`🔄 Баланс обновлен из Cloud: ${balance} ⭐`);
+                            }
+                        }
+                    });
+                } else {
+                    // Fallback - проверяем localStorage
+                    const savedBalance = localStorage.getItem(`balance_${currentUserId}`);
+                    if (savedBalance) {
+                        const balance = parseInt(savedBalance);
+                        const currentDisplayed = parseInt(document.getElementById('balance-amount').textContent.replace(/,/g, ''));
+                        
+                        if (balance !== currentDisplayed) {
+                            updateBalance(balance);
+                            console.log(`🔄 Баланс обновлен из localStorage: ${balance} ⭐`);
+                        }
+                    }
+                }
+            }
+        }, 2000);
+        
+        // Функция для тестирования (можно вызвать из консоли браузера)
+        window.testSetBalance = function(amount) {
+            if (currentUserId) {
+                updateBalance(amount);
+                console.log(`🧪 Тестовый баланс установлен: ${amount} ⭐`);
+                
+                // Показываем уведомление пользователю
+                if (tg && tg.showAlert) {
+                    tg.showAlert(`Баланс обновлен: ${amount} ⭐`);
+                }
+            } else {
+                console.log('❌ Пользователь не определен');
+            }
+        };
+        
+        // Функция для получения текущего баланса
+        window.getCurrentBalance = function() {
+            const balance = parseInt(document.getElementById('balance-amount').textContent.replace(/,/g, ''));
+            console.log(`💰 Текущий баланс: ${balance} ⭐`);
+            return balance;
+        };
+        
+        // Функция для получения ID пользователя
+        window.getUserId = function() {
+            console.log(`👤 ID пользователя: ${currentUserId}`);
+            return currentUserId;
+        };
+    </script>
 </body>
 </html>
