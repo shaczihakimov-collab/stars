@@ -3,8 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Stars Bot</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Telegram Stars Bot - WebApp</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Заголовок */
+        .header {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .platinum-badge {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .platinum-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        /* Баланс */
+        .balance-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .star-balance {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .star-icon {
+            font-size: 32px;
+            margin-right: 10px;
+        }
+
+        .balance-amount {
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .balance-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+        }
+
+        /* Кнопки действий */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .action-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 15px;
+            padding: 15px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .btn-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Карточка функции */
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-right: 15px;
+            background: rgba(255, 193, 7, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .feature-content {
+            flex: 1;
+        }
+
+        .feature-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .feature-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .feature-arrow {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* История транзакций */
+        .transactions-section h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .no-transactions {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .no-transactions-text {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container > * {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* WebApp специфичные стили */
+        .webapp-info {
+            background: rgba(42, 171, 238, 0.1);
+            border: 1px solid rgba(42, 171, 238, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .webapp-info h4 {
+            color: #2AABEE;
+            margin-bottom: 8px;
+        }
+
+        .webapp-info p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .user-details h4 {
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .user-details p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -16,29 +255,44 @@
             </div>
         </div>
 
+        <!-- WebApp информация -->
+        <div class="webapp-info">
+            <h4>🚀 Telegram WebApp</h4>
+            <p>Вы используете встроенное приложение в Telegram</p>
+        </div>
+
+        <!-- Информация о пользователе -->
+        <div class="user-info" id="user-info" style="display: none;">
+            <div class="user-avatar" id="user-avatar">👤</div>
+            <div class="user-details">
+                <h4 id="user-name">Пользователь</h4>
+                <p id="user-id">#000000</p>
+            </div>
+        </div>
+
         <!-- Баланс звезд -->
         <div class="balance-section">
             <div class="star-balance">
                 <span class="star-icon">⭐</span>
-                <span class="balance-amount">0</span>
+                <span class="balance-amount" id="balance-amount">0</span>
             </div>
             <div class="balance-text">Общий баланс в звездах</div>
         </div>
 
         <!-- Кнопки пополнить/вывести -->
         <div class="action-buttons">
-            <button class="action-btn deposit-btn" onclick="showDeposit()">
+            <button class="action-btn deposit-btn" onclick="quickDeposit()">
                 <div class="btn-icon">💰</div>
                 <div class="btn-text">Пополнить</div>
             </button>
-            <button class="action-btn withdraw-btn" onclick="showWithdraw()">
+            <button class="action-btn withdraw-btn" onclick="quickWithdraw()">
                 <div class="btn-icon">📤</div>
                 <div class="btn-text">Вывести</div>
             </button>
         </div>
 
         <!-- Карточка "Звезды чеками" -->
-        <div class="feature-card" onclick="showChecks()">
+        <div class="feature-card" onclick="quickCheck()">
             <div class="feature-icon">📋</div>
             <div class="feature-content">
                 <div class="feature-title">Звезды чеками</div>
@@ -54,64 +308,227 @@
                 <div class="no-transactions-text">Транзакций пока нет</div>
             </div>
         </div>
-
-        <!-- Главное меню (скрыто по умолчанию) -->
-        <div id="main-menu" class="menu-overlay" style="display: none;">
-            <div class="menu-content">
-                <div class="welcome-section">
-                    <img src="images/photo_2026-01-28_15-11-47.jpg" alt="Stars Bot" class="welcome-image">
-                    <div class="welcome-text">
-                        <h2>Привет! Это удобный бот для покупки/передачи звезд в Telegram.</h2>
-                        <p>С помощью него можно моментально покупать и передавать звезды.</p>
-                        <p>Бот работает почти год, и с помощью него куплена большая доля звезд в Telegram.</p>
-                        <div class="stats">
-                            <strong>С помощью бота куплено:</strong><br>
-                            7,357,760 ⭐ (~ $110,366)
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="menu-buttons">
-                    <div class="menu-row">
-                        <button class="menu-btn" onclick="showWallet()">👛 Кошелек</button>
-                        <button class="menu-btn" onclick="showShop()">🛒 Магазин</button>
-                    </div>
-                    <div class="menu-row">
-                        <button class="menu-btn" onclick="showDeposit()">💰 Пополнить Баланс</button>
-                        <button class="menu-btn" onclick="showCreateCheck()">⭐ Создать чек</button>
-                    </div>
-                    <div class="menu-row">
-                        <button class="menu-btn" onclick="showWithdraw()">💰 Вывести звезды</button>
-                        <button class="menu-btn" onclick="showAutoBuyer()">🎁 Автоскупщик подарков</button>
-                    </div>
-                    <div class="menu-row" id="auth-menu-row">
-                        <button class="menu-btn auth-btn" onclick="handleAuthAction()">
-                            <span id="auth-btn-text">🔐 Войти</span>
-                        </button>
-                    </div>
-                </div>
-                
-                <button class="close-menu" onclick="closeMenu()">✕</button>
-            </div>
-        </div>
-
-        <!-- Модальные окна для разных разделов -->
-        <div id="modal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="modal-title">Заголовок</h3>
-                    <button class="close-modal" onclick="closeModal()">✕</button>
-                </div>
-                <div class="modal-body" id="modal-body">
-                    Содержимое модального окна
-                </div>
-            </div>
-        </div>
-
-        <!-- Кнопка для открытия главного меню -->
-        <button class="menu-toggle" onclick="showMainMenu()">☰</button>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Инициализация Telegram WebApp
+        let tg = window.Telegram?.WebApp;
+        let userData = {
+            balance: 0,
+            transactions: []
+        };
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            initWebApp();
+            loadUserData();
+        });
+
+        function initWebApp() {
+            if (tg) {
+                // Настройка WebApp
+                tg.expand();
+                tg.ready();
+                
+                // Настройка главной кнопки
+                tg.MainButton.setText("🛒 Купить звезды");
+                tg.MainButton.color = "#FFD700";
+                tg.MainButton.textColor = "#000000";
+                tg.MainButton.show();
+                tg.MainButton.onClick(showShop);
+                
+                // Получаем данные пользователя
+                if (tg.initDataUnsafe?.user) {
+                    const user = tg.initDataUnsafe.user;
+                    document.getElementById('user-name').textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+                    document.getElementById('user-id').textContent = '#' + user.id;
+                    document.getElementById('user-info').style.display = 'flex';
+                    
+                    // Если есть фото профиля
+                    if (user.photo_url) {
+                        document.getElementById('user-avatar').innerHTML = `<img src="${user.photo_url}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                    }
+                }
+                
+                // Настройка темы
+                if (tg.themeParams) {
+                    document.body.style.backgroundColor = tg.themeParams.bg_color || '#1a1a2e';
+                }
+            }
+        }
+
+        function loadUserData() {
+            // Загружаем данные из localStorage
+            const savedBalance = localStorage.getItem('userBalance');
+            if (savedBalance) {
+                userData.balance = parseInt(savedBalance);
+                document.getElementById('balance-amount').textContent = userData.balance;
+            }
+        }
+
+        function saveUserData() {
+            localStorage.setItem('userBalance', userData.balance.toString());
+        }
+
+        function quickDeposit() {
+            if (tg) {
+                tg.showPopup({
+                    title: '💰 Пополнение баланса',
+                    message: 'Выберите способ пополнения:',
+                    buttons: [
+                        {id: 'card', type: 'default', text: '💳 Карта'},
+                        {id: 'crypto', type: 'default', text: '₿ Крипта'},
+                        {id: 'cancel', type: 'cancel', text: 'Отмена'}
+                    ]
+                }, function(buttonId) {
+                    if (buttonId === 'card') {
+                        tg.showAlert('Пополнение картой будет доступно в полной версии');
+                    } else if (buttonId === 'crypto') {
+                        tg.showAlert('Пополнение криптовалютой будет доступно в полной версии');
+                    }
+                });
+            } else {
+                alert('Функция пополнения доступна в полной версии');
+            }
+        }
+
+        function quickWithdraw() {
+            if (userData.balance === 0) {
+                if (tg) {
+                    tg.showAlert('Недостаточно средств для вывода. Пополните баланс.');
+                } else {
+                    alert('Недостаточно средств для вывода. Пополните баланс.');
+                }
+                return;
+            }
+            
+            if (tg) {
+                tg.showPopup({
+                    title: '📤 Вывод звезд',
+                    message: `Ваш баланс: ${userData.balance} ⭐\nВывести все звезды?`,
+                    buttons: [
+                        {id: 'withdraw', type: 'destructive', text: 'Вывести'},
+                        {id: 'cancel', type: 'cancel', text: 'Отмена'}
+                    ]
+                }, function(buttonId) {
+                    if (buttonId === 'withdraw') {
+                        processWithdraw();
+                    }
+                });
+            } else {
+                if (confirm(`Вывести ${userData.balance} ⭐?`)) {
+                    processWithdraw();
+                }
+            }
+        }
+
+        function processWithdraw() {
+            const amount = userData.balance;
+            const commission = Math.ceil(amount * 0.05);
+            const total = amount + commission;
+            
+            userData.balance = 0;
+            saveUserData();
+            document.getElementById('balance-amount').textContent = userData.balance;
+            
+            if (tg) {
+                tg.showAlert(`Успешно выведено ${amount} ⭐!\nКомиссия: ${commission} ⭐`);
+                tg.HapticFeedback.impactOccurred('medium');
+            } else {
+                alert(`Успешно выведено ${amount} ⭐!\nКомиссия: ${commission} ⭐`);
+            }
+        }
+
+        function quickCheck() {
+            if (userData.balance === 0) {
+                if (tg) {
+                    tg.showAlert('Недостаточно средств для создания чека. Пополните баланс.');
+                } else {
+                    alert('Недостаточно средств для создания чека. Пополните баланс.');
+                }
+                return;
+            }
+            
+            const amount = Math.min(userData.balance, 100);
+            
+            if (tg) {
+                tg.showPopup({
+                    title: '⭐ Создать чек',
+                    message: `Создать чек на ${amount} ⭐?`,
+                    buttons: [
+                        {id: 'create', type: 'default', text: 'Создать'},
+                        {id: 'cancel', type: 'cancel', text: 'Отмена'}
+                    ]
+                }, function(buttonId) {
+                    if (buttonId === 'create') {
+                        createCheck(amount);
+                    }
+                });
+            } else {
+                if (confirm(`Создать чек на ${amount} ⭐?`)) {
+                    createCheck(amount);
+                }
+            }
+        }
+
+        function createCheck(amount) {
+            userData.balance -= amount;
+            saveUserData();
+            document.getElementById('balance-amount').textContent = userData.balance;
+            
+            const checkId = Math.random().toString(36).substr(2, 9);
+            
+            if (tg) {
+                tg.showAlert(`Чек создан!\nСумма: ${amount} ⭐\nID: ${checkId}`);
+                tg.HapticFeedback.impactOccurred('light');
+            } else {
+                alert(`Чек создан!\nСумма: ${amount} ⭐\nID: ${checkId}`);
+            }
+        }
+
+        function showShop() {
+            if (tg) {
+                tg.showPopup({
+                    title: '🛒 Магазин звезд',
+                    message: 'Выберите пакет для покупки:',
+                    buttons: [
+                        {id: 'buy_100', type: 'default', text: '100 ⭐ - 150₽'},
+                        {id: 'buy_500', type: 'default', text: '500 ⭐ - 750₽'},
+                        {id: 'buy_1000', type: 'default', text: '1000 ⭐ - 1500₽'},
+                        {id: 'cancel', type: 'cancel', text: 'Отмена'}
+                    ]
+                }, function(buttonId) {
+                    if (buttonId === 'buy_100') {
+                        buyStars(100, 150);
+                    } else if (buttonId === 'buy_500') {
+                        buyStars(500, 750);
+                    } else if (buttonId === 'buy_1000') {
+                        buyStars(1000, 1500);
+                    }
+                });
+            }
+        }
+
+        function buyStars(stars, rubles) {
+            // Имитация покупки
+            userData.balance += stars;
+            saveUserData();
+            document.getElementById('balance-amount').textContent = userData.balance;
+            
+            if (tg) {
+                tg.showAlert(`Успешно куплено ${stars} ⭐ за ${rubles}₽!`);
+                tg.HapticFeedback.impactOccurred('medium');
+            } else {
+                alert(`Успешно куплено ${stars} ⭐ за ${rubles}₽!`);
+            }
+        }
+
+        // Обработка закрытия WebApp
+        if (tg) {
+            tg.onEvent('viewportChanged', function() {
+                console.log('Viewport changed');
+            });
+        }
+    </script>
 </body>
 </html>
