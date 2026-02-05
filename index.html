@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Stars Bot</title>
+    <title>Telegram Stars Bot - WebApp</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div class="container">
@@ -20,7 +21,7 @@
         <div class="balance-section">
             <div class="star-balance">
                 <span class="star-icon">⭐</span>
-                <span class="balance-amount">0</span>
+                <span class="balance-amount" id="balance-amount">0</span>
             </div>
             <div class="balance-text">Общий баланс в звездах</div>
         </div>
@@ -113,5 +114,157 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // Инициализация Telegram WebApp
+        let tg = window.Telegram?.WebApp;
+        let currentUserId = null;
+        let currentBalance = 0;
+        
+        if (tg) {
+            // Настройка WebApp
+            tg.expand();
+            tg.ready();
+            
+            // Настройка главной кнопки
+            tg.MainButton.setText("🛒 Купить звезды");
+            tg.MainButton.color = "#FFD700";
+            tg.MainButton.textColor = "#000000";
+            tg.MainButton.show();
+            tg.MainButton.onClick(showShop);
+            
+            // Получаем данные пользователя
+            if (tg.initDataUnsafe?.user) {
+                const user = tg.initDataUnsafe.user;
+                currentUserId = user.id;
+                console.log('Telegram user:', user);
+                
+                // Загружаем баланс пользователя
+                loadUserBalance(user.id);
+            }
+            
+            // Настройка темы
+            if (tg.themeParams) {
+                document.body.style.backgroundColor = tg.themeParams.bg_color || '#1a1a2e';
+            }
+        } else {
+            // Если не в Telegram WebApp, используем обычную логику
+            console.log('Не в Telegram WebApp, используем обычный режим');
+            loadUserBalance('demo_user');
+        }
+        
+        // Функция для загрузки баланса пользователя
+        function loadUserBalance(userId) {
+            // Пытаемся загрузить баланс из Telegram Cloud Storage
+            if (tg && tg.CloudStorage) {
+                tg.CloudStorage.getItem(`balance_${userId}`, function(err, value) {
+                    if (!err && value) {
+                        const balance = parseInt(value);
+                        updateBalance(balance);
+                        console.log(`✅ Баланс загружен из Telegram Cloud: ${balance} ⭐`);
+                        return;
+                    }
+                    
+                    // Fallback к localStorage
+                    loadFromLocalStorage(userId);
+                });
+            } else {
+                // Fallback к localStorage
+                loadFromLocalStorage(userId);
+            }
+        }
+        
+        // Функция для загрузки из localStorage
+        function loadFromLocalStorage(userId) {
+            const userBalance = localStorage.getItem(`balance_${userId}`);
+            if (userBalance) {
+                const balance = parseInt(userBalance);
+                updateBalance(balance);
+                console.log(`✅ Баланс загружен из localStorage: ${balance} ⭐`);
+            } else {
+                // Если баланса нет, устанавливаем 0
+                updateBalance(0);
+                localStorage.setItem(`balance_${userId}`, '0');
+                console.log('💡 Установлен начальный баланс: 0 ⭐');
+            }
+        }
+        
+        // Функция для обновления баланса в WebApp
+        function updateBalance(newBalance) {
+            currentBalance = newBalance;
+            document.getElementById('balance-amount').textContent = newBalance.toLocaleString();
+            
+            // Сохраняем в localStorage
+            if (currentUserId) {
+                localStorage.setItem(`balance_${currentUserId}`, newBalance.toString());
+                
+                // Также сохраняем в Telegram Cloud Storage если доступно
+                if (tg && tg.CloudStorage) {
+                    tg.CloudStorage.setItem(`balance_${currentUserId}`, newBalance.toString());
+                }
+            }
+        }
+        
+        // Проверяем обновления баланса каждые 3 секунды
+        setInterval(() => {
+            if (currentUserId) {
+                // Проверяем Telegram Cloud Storage
+                if (tg && tg.CloudStorage) {
+                    tg.CloudStorage.getItem(`balance_${currentUserId}`, function(err, value) {
+                        if (!err && value) {
+                            const balance = parseInt(value);
+                            if (balance !== currentBalance) {
+                                updateBalance(balance);
+                                console.log(`🔄 Баланс обновлен из Cloud: ${balance} ⭐`);
+                            }
+                        }
+                    });
+                } else {
+                    // Fallback - проверяем localStorage
+                    const savedBalance = localStorage.getItem(`balance_${currentUserId}`);
+                    if (savedBalance) {
+                        const balance = parseInt(savedBalance);
+                        if (balance !== currentBalance) {
+                            updateBalance(balance);
+                            console.log(`🔄 Баланс обновлен из localStorage: ${balance} ⭐`);
+                        }
+                    }
+                }
+            }
+        }, 3000);
+        
+        // Функция для тестирования (можно вызвать из консоли браузера)
+        window.testSetBalance = function(amount) {
+            if (currentUserId || currentUserId === 'demo_user') {
+                updateBalance(amount);
+                console.log(`🧪 Тестовый баланс установлен: ${amount} ⭐`);
+                
+                // Показываем уведомление пользователю
+                if (tg && tg.showAlert) {
+                    tg.showAlert(`Баланс обновлен: ${amount} ⭐`);
+                } else {
+                    alert(`Баланс обновлен: ${amount} ⭐`);
+                }
+            } else {
+                console.log('❌ Пользователь не определен');
+            }
+        };
+        
+        // Функция для получения текущего баланса
+        window.getCurrentBalance = function() {
+            console.log(`💰 Текущий баланс: ${currentBalance} ⭐`);
+            return currentBalance;
+        };
+        
+        // Функция для получения ID пользователя
+        window.getUserId = function() {
+            console.log(`👤 ID пользователя: ${currentUserId}`);
+            return currentUserId;
+        };
+        
+        // Обновляем userData для совместимости с script.js
+        if (typeof userData !== 'undefined') {
+            userData.balance = currentBalance;
+        }
+    </script>
 </body>
 </html>
