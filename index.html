@@ -3,47 +3,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Stars Bot - WebApp</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Buy Sell Stars</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* Заголовок */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .platinum-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Баланс */
+        .balance-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .balance-amount {
+            font-size: 56px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .balance-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Кнопки действий */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-icon {
+            font-size: 28px;
+        }
+
+        .deposit-btn {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(76, 175, 80, 0.1) 100%);
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+
+        .withdraw-btn {
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.2) 0%, rgba(33, 150, 243, 0.1) 100%);
+            border-color: rgba(33, 150, 243, 0.3);
+        }
+
+        /* Карточка функции */
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .feature-card:active {
+            transform: scale(0.98);
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 12px;
+        }
+
+        .feature-content {
+            flex: 1;
+        }
+
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feature-description {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .feature-arrow {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* История транзакций */
+        .transactions-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .transactions-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .no-transactions {
+            text-align: center;
+            padding: 30px 20px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+        }
+
+        /* Футер */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container > * {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .balance-card {
+            animation-delay: 0.1s;
+        }
+
+        .action-buttons {
+            animation-delay: 0.2s;
+        }
+
+        .feature-card {
+            animation-delay: 0.3s;
+        }
+
+        .transactions-section {
+            animation-delay: 0.4s;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <!-- Заголовок с Platinum статусом -->
+        <!-- Заголовок -->
         <div class="header">
             <div class="platinum-badge">
-                <span class="platinum-icon">💎</span>
+                <span>💎</span>
                 <span>Platinum</span>
             </div>
         </div>
 
-        <!-- Баланс звезд -->
-        <div class="balance-section">
-            <div class="star-balance">
-                <span class="star-icon">⭐</span>
-                <span class="balance-amount" id="balance-amount">0</span>
+        <!-- Баланс -->
+        <div class="balance-card">
+            <div class="balance-label">Баланс</div>
+            <div class="balance-amount">
+                <span>⭐</span>
+                <span id="balance-amount">0</span>
             </div>
-            <div class="balance-text">Общий баланс в звездах</div>
+            <div class="balance-label">Звезд</div>
         </div>
 
-        <!-- Кнопки пополнить/вывести -->
+        <!-- Кнопки действий -->
         <div class="action-buttons">
             <button class="action-btn deposit-btn" onclick="showDeposit()">
                 <div class="btn-icon">💰</div>
-                <div class="btn-text">Пополнить</div>
+                <div>Пополнить</div>
             </button>
             <button class="action-btn withdraw-btn" onclick="showWithdraw()">
                 <div class="btn-icon">📤</div>
-                <div class="btn-text">Вывести</div>
+                <div>Вывести</div>
             </button>
         </div>
 
-        <!-- Карточка "Звезды чеками" -->
+        <!-- Карточка чеков -->
         <div class="feature-card" onclick="showChecks()">
             <div class="feature-icon">📋</div>
             <div class="feature-content">
                 <div class="feature-title">Звезды чеками</div>
-                <div class="feature-description">Делитесь звездами с помощью чеков.</div>
+                <div class="feature-description">Делитесь звездами с помощью чеков</div>
             </div>
             <div class="feature-arrow">›</div>
         </div>
@@ -52,68 +284,16 @@
         <div class="transactions-section">
             <h3>История транзакций</h3>
             <div class="no-transactions">
-                <div class="no-transactions-text">Транзакций пока нет</div>
+                Транзакций пока нет
             </div>
         </div>
 
-        <!-- Главное меню (скрыто по умолчанию) -->
-        <div id="main-menu" class="menu-overlay" style="display: none;">
-            <div class="menu-content">
-                <div class="welcome-section">
-                    <img src="images/photo_2026-01-28_15-11-47.jpg" alt="Stars Bot" class="welcome-image">
-                    <div class="welcome-text">
-                        <h2>Привет! Это удобный бот для покупки/передачи звезд в Telegram.</h2>
-                        <p>С помощью него можно моментально покупать и передавать звезды.</p>
-                        <p>Бот работает почти год, и с помощью него куплена большая доля звезд в Telegram.</p>
-                        <div class="stats">
-                            <strong>С помощью бота куплено:</strong><br>
-                            7,357,760 ⭐ (~ $110,366)
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="menu-buttons">
-                    <div class="menu-row">
-                        <button class="menu-btn" onclick="showWallet()">👛 Кошелек</button>
-                        <button class="menu-btn" onclick="showShop()">🛒 Магазин</button>
-                    </div>
-                    <div class="menu-row">
-                        <button class="menu-btn" onclick="showDeposit()">💰 Пополнить Баланс</button>
-                        <button class="menu-btn" onclick="showCreateCheck()">⭐ Создать чек</button>
-                    </div>
-                    <div class="menu-row">
-                        <button class="menu-btn" onclick="showWithdraw()">💰 Вывести звезды</button>
-                        <button class="menu-btn" onclick="showAutoBuyer()">🎁 Автоскупщик подарков</button>
-                    </div>
-                    <div class="menu-row" id="auth-menu-row">
-                        <button class="menu-btn auth-btn" onclick="handleAuthAction()">
-                            <span id="auth-btn-text">🔐 Войти</span>
-                        </button>
-                    </div>
-                </div>
-                
-                <button class="close-menu" onclick="closeMenu()">✕</button>
-            </div>
+        <!-- Футер -->
+        <div class="footer">
+            @BuySellStarsbot
         </div>
-
-        <!-- Модальные окна для разных разделов -->
-        <div id="modal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="modal-title">Заголовок</h3>
-                    <button class="close-modal" onclick="closeModal()">✕</button>
-                </div>
-                <div class="modal-body" id="modal-body">
-                    Содержимое модального окна
-                </div>
-            </div>
-        </div>
-
-        <!-- Кнопка для открытия главного меню -->
-        <button class="menu-toggle" onclick="showMainMenu()">☰</button>
     </div>
 
-    <script src="script.js"></script>
     <script>
         // Инициализация Telegram WebApp
         let tg = window.Telegram?.WebApp;
@@ -121,150 +301,114 @@
         let currentBalance = 0;
         
         if (tg) {
-            // Настройка WebApp
             tg.expand();
             tg.ready();
             
-            // Настройка главной кнопки
-            tg.MainButton.setText("🛒 Купить звезды");
-            tg.MainButton.color = "#FFD700";
-            tg.MainButton.textColor = "#000000";
-            tg.MainButton.show();
-            tg.MainButton.onClick(showShop);
+            // Настройка темы
+            if (tg.themeParams) {
+                document.body.style.background = tg.themeParams.bg_color || 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)';
+            }
             
             // Получаем данные пользователя
             if (tg.initDataUnsafe?.user) {
                 const user = tg.initDataUnsafe.user;
                 currentUserId = user.id;
-                console.log('Telegram user:', user);
-                
-                // Загружаем баланс пользователя
+                console.log('👤 Пользователь:', user);
                 loadUserBalance(user.id);
             }
-            
-            // Настройка темы
-            if (tg.themeParams) {
-                document.body.style.backgroundColor = tg.themeParams.bg_color || '#1a1a2e';
-            }
-        } else {
-            // Если не в Telegram WebApp, используем обычную логику
-            console.log('Не в Telegram WebApp, используем обычный режим');
-            loadUserBalance('demo_user');
         }
         
-        // Функция для загрузки баланса пользователя
+        // Загрузка баланса
         function loadUserBalance(userId) {
-            // Пытаемся загрузить баланс из Telegram Cloud Storage
             if (tg && tg.CloudStorage) {
                 tg.CloudStorage.getItem(`balance_${userId}`, function(err, value) {
                     if (!err && value) {
-                        const balance = parseInt(value);
-                        updateBalance(balance);
-                        console.log(`✅ Баланс загружен из Telegram Cloud: ${balance} ⭐`);
+                        updateBalance(parseInt(value));
                         return;
                     }
-                    
-                    // Fallback к localStorage
                     loadFromLocalStorage(userId);
                 });
             } else {
-                // Fallback к localStorage
                 loadFromLocalStorage(userId);
             }
         }
         
-        // Функция для загрузки из localStorage
         function loadFromLocalStorage(userId) {
-            const userBalance = localStorage.getItem(`balance_${userId}`);
-            if (userBalance) {
-                const balance = parseInt(userBalance);
-                updateBalance(balance);
-                console.log(`✅ Баланс загружен из localStorage: ${balance} ⭐`);
-            } else {
-                // Если баланса нет, устанавливаем 0
-                updateBalance(0);
-                localStorage.setItem(`balance_${userId}`, '0');
-                console.log('💡 Установлен начальный баланс: 0 ⭐');
-            }
+            const balance = localStorage.getItem(`balance_${userId}`) || '0';
+            updateBalance(parseInt(balance));
         }
         
-        // Функция для обновления баланса в WebApp
         function updateBalance(newBalance) {
             currentBalance = newBalance;
             document.getElementById('balance-amount').textContent = newBalance.toLocaleString();
             
-            // Сохраняем в localStorage
             if (currentUserId) {
                 localStorage.setItem(`balance_${currentUserId}`, newBalance.toString());
-                
-                // Также сохраняем в Telegram Cloud Storage если доступно
                 if (tg && tg.CloudStorage) {
                     tg.CloudStorage.setItem(`balance_${currentUserId}`, newBalance.toString());
                 }
             }
         }
         
-        // Проверяем обновления баланса каждые 3 секунды
+        // Автообновление баланса
         setInterval(() => {
             if (currentUserId) {
-                // Проверяем Telegram Cloud Storage
                 if (tg && tg.CloudStorage) {
                     tg.CloudStorage.getItem(`balance_${currentUserId}`, function(err, value) {
                         if (!err && value) {
                             const balance = parseInt(value);
                             if (balance !== currentBalance) {
                                 updateBalance(balance);
-                                console.log(`🔄 Баланс обновлен из Cloud: ${balance} ⭐`);
                             }
                         }
                     });
-                } else {
-                    // Fallback - проверяем localStorage
-                    const savedBalance = localStorage.getItem(`balance_${currentUserId}`);
-                    if (savedBalance) {
-                        const balance = parseInt(savedBalance);
-                        if (balance !== currentBalance) {
-                            updateBalance(balance);
-                            console.log(`🔄 Баланс обновлен из localStorage: ${balance} ⭐`);
-                        }
-                    }
                 }
             }
         }, 3000);
         
-        // Функция для тестирования (можно вызвать из консоли браузера)
-        window.testSetBalance = function(amount) {
-            if (currentUserId || currentUserId === 'demo_user') {
-                updateBalance(amount);
-                console.log(`🧪 Тестовый баланс установлен: ${amount} ⭐`);
-                
-                // Показываем уведомление пользователю
-                if (tg && tg.showAlert) {
-                    tg.showAlert(`Баланс обновлен: ${amount} ⭐`);
-                } else {
-                    alert(`Баланс обновлен: ${amount} ⭐`);
-                }
+        // Функции действий
+        function showDeposit() {
+            if (tg) {
+                tg.showAlert('💰 Пополнение баланса\n\nВыберите способ пополнения в боте');
             } else {
-                console.log('❌ Пользователь не определен');
+                alert('Функция доступна в Telegram');
             }
+        }
+        
+        function showWithdraw() {
+            if (tg) {
+                tg.showAlert('📤 Вывод звезд\n\nВаш баланс: ' + currentBalance + ' ⭐\n\nИспользуйте бота для вывода');
+            } else {
+                alert('Функция доступна в Telegram');
+            }
+        }
+        
+        function showChecks() {
+            if (tg) {
+                tg.showAlert('📋 Звезды чеками\n\nСоздавайте чеки и делитесь звездами с друзьями');
+            } else {
+                alert('Функция доступна в Telegram');
+            }
+        }
+        
+        // Тестовая функция
+        window.testSetBalance = function(amount) {
+            updateBalance(amount);
+            if (tg) {
+                tg.showAlert('✅ Баланс обновлен: ' + amount + ' ⭐');
+            }
+            console.log('✅ Баланс установлен:', amount);
         };
         
-        // Функция для получения текущего баланса
         window.getCurrentBalance = function() {
-            console.log(`💰 Текущий баланс: ${currentBalance} ⭐`);
+            console.log('💰 Текущий баланс:', currentBalance);
             return currentBalance;
         };
         
-        // Функция для получения ID пользователя
         window.getUserId = function() {
-            console.log(`👤 ID пользователя: ${currentUserId}`);
+            console.log('👤 ID пользователя:', currentUserId);
             return currentUserId;
         };
-        
-        // Обновляем userData для совместимости с script.js
-        if (typeof userData !== 'undefined') {
-            userData.balance = currentBalance;
-        }
     </script>
 </body>
 </html>
